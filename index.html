@@ -3,39 +3,86 @@
 <body>
 
     <h1>Welcome to Multimap!</h1>
+
+    <div id="slidecontainer">
+        <input type="range" min="1" max="30" value="1" class="slider" id="colorSlider">
+        <p>Colors:
+            <span id="colorsBox"></span>
+        </p>
+        <input type="range" min="0" max="10" value="0" class="slider" id="deltaSlider">
+        <p>delta:
+            <span id="deltaBox"></span>
+        </p>
+    </div>
+
     <canvas id="myCanvas" style="border:1px solid #c3c3c3;">
-        Your browser does not support the canvas element.
     </canvas>
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
 
     <script>
         var canvas = document.getElementById("myCanvas");
+        var cSlider = document.getElementById("colorSlider");
+        var cOutput = document.getElementById("colorsBox");
+        var dSlider = document.getElementById("deltaSlider");
+        var dOutput = document.getElementById("deltaBox");
+        cSlider.oninput = function () {
+            cOutput.innerHTML = this.value;
+            colors = this.value;
+            r = 360;
+            i = 1;
+            t = 0;
+            angle = parseFloat(180 * (1 / m + 1 / n) + delta);
+            drawMap(colors, delta);
+        }
+        dSlider.oninput = function () {
+            dOutput.innerHTML = this.value;
+            delta = this.value / 10;
+            r = 350;
+            i = 1;
+            t = 0;
+            angle = parseFloat(180 * (1 / m + 1 / n) + delta);
+            drawMap(colors, delta);
+        }
+        cOutput.innerHTML = cSlider.value; // Display the default slider value
+        dOutput.innerHTML = dSlider.value;
         var w = 800;
         var h = 800;
         var o = {};
         var d = {};
-        var n = 5;
-        var m = 6;
-        colors = 6; // Number of colors
-        delta = 2 // Offset from exact periodicity
-        var angle = 180 * (1 / m + 1 / n) +  delta;
-        var r = 350;
-        var t = 0;
-        var i = 1;
+        var delta;
+        var angle;
         c = Math.PI / 180 // Degrees to radians conversion factor
         canvas.width = w;
         canvas.height = h;
-        o.x= w / 2;
+        o.x = w / 2;
         o.y = h / 2;
-        while (r > 20) {
-            d.x = o.x + r * Math.cos(c * t);
-            d.y = o.y + r * Math.sin(c * t);
-            var ctx = canvas.getContext("2d");
-            var hue = (360 / (i % colors)).toString();
-            ctx.fillStyle = "hsl(" + hue + ", 100%, 50%)";
-            ctx.fillRect(d.x, d.y, 7, 7);
-            t += angle;
-            i++;
-            r *= 0.999;
+        colors = cSlider.value;
+        delta = dSlider.value / 10;
+        var n = 5;
+        var m = 5;
+        angle = parseFloat(180 * (1 / m + 1 / n) + delta);
+        var r = 350;
+        var t = 0;
+        var i = 1;
+        drawMap(colors, delta);
+
+        function drawMap(colors, delta) {
+            while (r > 20) {
+                d.x = o.x + r * Math.cos(c * t);
+                d.y = o.y + r * Math.sin(c * t);
+                var ctx = canvas.getContext("2d");
+                var hue = ((360 / colors) * i).toString();
+                ctx.fillStyle = "hsl(" + hue + ", 100%, 50%)";
+                ctx.fillRect(d.x, d.y, 7, 7);
+                t += angle;
+                i++;
+                r *= 0.999;
+            }
+        }
+
+        function clearScreen() {
+            $("#myCanvas").empty();
         }
     </script>
 
