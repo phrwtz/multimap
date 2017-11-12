@@ -12,7 +12,7 @@
         </tr>
         <tr align="center">
             <td>
-                <input type="range" min="2" max="360" value=2 class="slider" length="2" id="colorSlider">
+                <input type="range" min="1" max="360" value=1 class="slider" length="2" id="colorSlider">
             </td>
             <td>
                 <input type="range" min="1" max="180" value="30" step="1" class="slider" id="angleSlider">
@@ -25,7 +25,8 @@
             <td>
                 <textarea readonly name="colorsBox" id="colorsBox" cols="18" rows="1"></textarea>
             </td>
-            <td><textarea readonly name="angleBox" id="angleBox" cols="18" rows="1"></textarea>
+            <td>
+                <textarea readonly name="angleBox" id="angleBox" cols="18" rows="1"></textarea>
             </td>
             <td>
                 <textarea readonly name="deltaBox" id="deltaBox" cols="18" rows="1"></textarea>
@@ -33,7 +34,7 @@
         </tr>
         <tr>
             <td colspan="3" align="center">
-                    <textarea readonly name="infoBos" id="infoBox" cols="25" rows="1"></textarea>
+                <textarea readonly name="infoBos" id="infoBox" cols="35" rows="1"></textarea>
             </td>
         </tr>
     </table>
@@ -69,8 +70,8 @@
             r = 360,
             t = 0,
             i = 1,
-            tolerance = .0001,
             c = Math.PI / 180; // Degrees to radians conversion factor
+            approxEquql = "&#8776"; //Unicode
 
         canvas.width = w;
         canvas.height = h;
@@ -89,13 +90,23 @@
             angleStr = aSlider.value;
             angle = parseFloat(angleStr);
             theta = angle + delta;
-            aOutput.innerHTML = theta;
-            cm = theta * colors / 360; //Multiple of 360 that equals colors times angle
-            roundCM = Math.round(cm * 1000) / 1000;
-            oneOverCM = Math.round(1000 / cm) / 1000;
-            cMsg = (cm < 1 ? "= 360 / " + oneOverCM : "= 360 X " + roundCM);
-            iOutput.innerHTML = theta + " X " + colors + cMsg;
-
+            aOutput.innerHTML = Math.round(theta * 1000) / 1000;
+            cm = theta / 360; //Multiple of 360 that equals colors times angle
+            if (isInteger(cm, .001)) {
+                cMsg = (Math.round(cm) == 1 ? " &#8776 360" : " &#8776 360 * " + Math.round(cm));
+            } else {
+                matrix = findFraction(theta/360);
+                if (matrix[2] == 0) {
+                    roundCM = Math.round(cm * 1000) / 1000;
+                    oneOverCM = Math.round(1000 / cm) / 1000;
+                    cMsg = (cm < 1 ? " &#8776 360 / " + oneOverCM : " &#8776 360 X " + roundCM);
+                } else {
+                    cMsg = (cm < 1 ? " = 360 * " + matrix[1] + "/" + matrix[2] : " = 360 * (" + matrix[0] + " + " +
+                        matrix[1] +
+                        "/" + matrix[2] + ")")
+                }
+            }
+            iOutput.innerHTML = theta + cMsg;
         }
 
 
@@ -136,10 +147,6 @@
                 t += angle + delta;
                 i++;
                 r *= 0.9999;
-                if (((t - (Math.floor(t))) < tolerance) || ((t + 2 * tolerance) - (Math.floor(t + 2 * tolerance)) <
-                        tolerance)) {
-
-                }
             }
         }
 
@@ -147,12 +154,28 @@
             ctx.clearRect(0, 0, 800, 800);
         }
 
-        function gcd(a, b) { //Gets the greatest common divisor of a and b by Euclid's method. Note: assumes a and b positive integers
-            if (!b) {
-                return a;
-            }
-            return gcd(b, a % b)
+        function isInteger(num, tol) {
+            return ((num - (Math.floor(num)) < tol) || (num - Math.floor(num + 2 * tol)) < tol)
         }
+
+        function findFraction(n) {
+            if (!isInteger(n)) {
+                var fraction = [0, 0, 0];
+                var intPart = Math.floor(n);
+                var fracPart = n - intPart;
+                for (var denominator = 2; denominator < 200; denominator++) {
+                    var numerator = fracPart * denominator;
+                    if (isInteger(numerator, 0.001)) {
+                        fraction = [intPart, Math.round(numerator), denominator];
+                        break;
+                    } else {
+                        fraction = [intPart, fracPart, 0];
+                    }
+                }
+                return fraction;
+            }
+        }
+
 
         setParameters();
         drawMap();
