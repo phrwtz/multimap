@@ -12,10 +12,10 @@
         </tr>
         <tr align="center">
             <td>
-                <input type="range" min="1" max="360" value=1 class="slider" length="2" id="colorSlider">
+                <input type="range" min="1" max="360" value=1 class="slider" id="colorSlider">
             </td>
             <td>
-                <input type="range" min="1" max="180" value="30" step="1" class="slider" id="angleSlider">
+                <input type="range" min="0" max="180" value="30" step="1" class="slider" id="angleSlider">
             </td>
             <td>
                 <input type="range" min="0" max="1" value="0" step="0.001" class="slider" id="deltaSlider">
@@ -23,18 +23,18 @@
         </tr>
         <tr align="center">
             <td>
-                <textarea readonly name="colorsBox" id="colorsBox" cols="18" rows="1"></textarea>
+                <textarea readonly name="colorsBox" id="colorsBox" cols="18" rows="1" style="font-size: 16px"></textarea>
             </td>
             <td>
-                <textarea readonly name="angleBox" id="angleBox" cols="18" rows="1"></textarea>
+                <textarea readonly name="angleBox" id="angleBox" cols="18" rows="1" style="font-size: 16px"></textarea>
             </td>
             <td>
-                <textarea readonly name="deltaBox" id="deltaBox" cols="18" rows="1"></textarea>
+                <textarea readonly name="deltaBox" id="deltaBox" cols="18" rows="1" style="font-size: 16px"></textarea>
             </td>
         </tr>
         <tr>
             <td colspan="3" align="center">
-                <textarea readonly name="infoBos" id="infoBox" cols="35" rows="1"></textarea>
+                <textarea readonly name="infoBos" id="infoBox" cols="35" style="font-size: 18px" rows="1"></textarea>
             </td>
         </tr>
     </table>
@@ -69,9 +69,10 @@
             hue = "",
             r = 360,
             t = 0,
-            i = 1,
-            c = Math.PI / 180; // Degrees to radians conversion factor
-            approxEquql = "&#8776"; //Unicode
+            i = 0,
+            c = Math.PI / 180, // Degrees to radians conversion factor
+            approxEqual = "&#8776", //Unicode for "approximately equal"
+            degrees = "&#x00B0";
 
         canvas.width = w;
         canvas.height = h;
@@ -90,23 +91,23 @@
             angleStr = aSlider.value;
             angle = parseFloat(angleStr);
             theta = angle + delta;
-            aOutput.innerHTML = Math.round(theta * 1000) / 1000;
+            aOutput.innerHTML = (Math.round(theta * 1000) / 1000) + " " + degrees;
             cm = theta / 360; //Multiple of 360 that equals colors times angle
             if (isInteger(cm, .001)) {
-                cMsg = (Math.round(cm) == 1 ? " &#8776 360" : " &#8776 360 * " + Math.round(cm));
+                cMsg = (Math.round(cm) == 1 ? " &#8776 360&#x00B0" : " &#8776 360" + "&#x00B0" + " * " + Math.round(cm));
             } else {
-                matrix = findFraction(theta/360);
+                matrix = findFraction(theta / 360);
                 if (matrix[2] == 0) {
-                    roundCM = Math.round(cm * 1000) / 1000;
+                    roundCM = Math.round(cm * 100000) / 100000;
                     oneOverCM = Math.round(1000 / cm) / 1000;
-                    cMsg = (cm < 1 ? " &#8776 360 / " + oneOverCM : " &#8776 360 X " + roundCM);
+                    cMsg = " " + approxEqual + " 360 X " + roundCM;
                 } else {
-                    cMsg = (cm < 1 ? " = 360 * " + matrix[1] + "/" + matrix[2] : " = 360 * (" + matrix[0] + " + " +
-                        matrix[1] +
-                        "/" + matrix[2] + ")")
-                }
+                    cMsg = (Math.round(theta * 1000) / 1000) + (cm < 1 ? " " + approxEqual + " 360 * " + matrix[1] + "/" +
+                    matrix[2] : " " + approxEqual + " 360 * (" + matrix[0] + " + " +
+                    matrix[1] + "/" + matrix[2] + ")")
             }
-            iOutput.innerHTML = theta + cMsg;
+        }
+        iOutput.innerHTML = cMsg;
         }
 
 
@@ -115,7 +116,7 @@
             setParameters();
             r = 360;
             t = 0;
-            i = 1;
+            i = 0;
             drawMap();
         }
 
@@ -124,7 +125,7 @@
             setParameters();
             r = 360;
             t = 0;
-            i = 1;
+            i = 0;
             drawMap();
         }
 
@@ -133,7 +134,7 @@
             setParameters();
             r = 360;
             t = 0;
-            i = 1;
+            i = 0;
             drawMap();
         }
 
@@ -163,7 +164,7 @@
                 var fraction = [0, 0, 0];
                 var intPart = Math.floor(n);
                 var fracPart = n - intPart;
-                for (var denominator = 2; denominator < 200; denominator++) {
+                for (var denominator = 2; denominator < 360; denominator++) {
                     var numerator = fracPart * denominator;
                     if (isInteger(numerator, 0.001)) {
                         fraction = [intPart, Math.round(numerator), denominator];
