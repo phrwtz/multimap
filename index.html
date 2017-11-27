@@ -164,7 +164,7 @@
                 var fraction = [0, 0, 0];
                 var intPart = Math.floor(n);
                 var fracPart = n - intPart;
-                for (var denominator = 2; denominator < 360; denominator++) {
+                for (var denominator = 2; denominator < 361; denominator++) {
                     var numerator = fracPart * denominator;
                     if (isInteger(numerator, 0.001)) {
                         fraction = [intPart, Math.round(numerator), denominator];
