@@ -141,7 +141,7 @@
         function drawMap() {
             while (r > 20) {
                 dx = cx + r * Math.cos(c * t);
-                dy = cy + r * Math.sin(c * t);
+                dy = cy - r * Math.sin(c * t);
                 hue = ((360 / colors) * i).toString();
                 ctx.fillStyle = "hsl(" + hue + ", 100%, 50%)";
                 ctx.fillRect(dx, dy, 3, 3);
